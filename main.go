@@ -2,9 +2,9 @@ package main
 
 import (
 	//	"errors"
-	//	"fmt"
+	"fmt"
 	//	"os"
-	"slices"
+	//	"slices"
 	//	"strconv"
 	//	"strings"
 	//	"time"
@@ -20,6 +20,7 @@ type BibleArgs struct {
 	Bible_s string
 	Book_s  string
 	Chap_s  string
+	Verse_s string
 }
 
 func main() {
@@ -40,18 +41,25 @@ func main() {
 		Run()
 
 	// Choose a Book of the Bible
-	bookid := Bookid(bibleargs.Bible_s)
-
-	var bookids []string
-
-	for i := 0; i < len(bookid); i++ {
-		bookids = slices.Insert(bookids, len(bookids), bookid[i].Name)
-	}
-
 	huh.NewSelect[string]().
-		Options(huh.NewOptions(bookids...)...).
-		Title("Choose a Book").
+		Options(huh.NewOptions(Bookid(bibleargs.Bible_s)...)...).
+		Title(fmt.Sprintf("Choose a Book from the %s", bibleargs.Bible_s)).
 		Value(&bibleargs.Book_s).
 		Run()
 
+	// Choose a Chapter of the Bible
+	huh.NewSelect[string]().
+		Options(huh.NewOptions(Chapid(bibleargs.Bible_s, bibleargs.Book_s)...)...).
+		Title(fmt.Sprintf("Choose a Chapter from the Book of %s", bibleargs.Book_s)).
+		Value(&bibleargs.Chap_s).
+		Run()
+
+	// Choose a Verse from the Chapter of the Bible Selected
+	huh.NewSelect[string]().
+		Options(huh.NewOptions(Verseid(bibleargs.Bible_s, bibleargs.Book_s, bibleargs.Chap_s)...)...).
+		Title(fmt.Sprintf("Choose a Chapter from %s %s", bibleargs.Book_s, bibleargs.Chap_s)).
+		Value(&bibleargs.Verse_s).
+		Run()
+
+	fmt.Printf("%s", Biblecontent(bibleargs.Bible_s, bibleargs.Book_s, bibleargs.Chap_s, bibleargs.Verse_s))
 }
